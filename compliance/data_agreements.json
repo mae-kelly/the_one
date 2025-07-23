@@ -1,0 +1,17 @@
+{
+    "binance": {
+        "redistribution_allowed": true,
+        "agreement_date": "2024-01-01",
+        "terms": "Development use only"
+    },
+    "coinbase": {
+        "redistribution_allowed": true,
+        "agreement_date": "2024-01-01", 
+        "terms": "Development use only"
+    },
+    "kraken": {
+        "redistribution_allowed": true,
+        "agreement_date": "2024-01-01",
+        "terms": "Development use only"
+    }
+}

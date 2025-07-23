@@ -1,0 +1,329 @@
+environment: production
+
+database:
+  postgres_url: ${POSTGRES_URL}
+  redis_url: ${REDIS_URL}
+  clickhouse_url: ${CLICKHOUSE_URL}
+  connection_pool_size: 50
+  query_timeout: 30
+
+exchanges:
+  okx:
+    api_key: ${OKX_API_KEY}
+    secret_key: ${OKX_SECRET_KEY}
+    passphrase: ${OKX_PASSPHRASE}
+    sandbox: false
+    rate_limit: 20
+    max_position_size: 1000000
+    supported_symbols: ["BTC-USDT", "ETH-USDT", "SOL-USDT", "ADA-USDT", "DOT-USDT"]
+    
+  binance:
+    api_key: ${BINANCE_API_KEY}
+    secret_key: ${BINANCE_SECRET_KEY}
+    sandbox: false
+    rate_limit: 20
+    max_position_size: 1000000
+    supported_symbols: ["BTCUSDT", "ETHUSDT", "SOLUSDT", "ADAUSDT", "DOTUSDT"]
+    
+  coinbase:
+    api_key: ${COINBASE_API_KEY}
+    secret_key: ${COINBASE_SECRET_KEY}
+    passphrase: ${COINBASE_PASSPHRASE}
+    sandbox: false
+    rate_limit: 30
+    max_position_size: 500000
+    supported_symbols: ["BTC-USD", "ETH-USD", "SOL-USD", "ADA-USD", "DOT-USD"]
+    
+  kraken:
+    api_key: ${KRAKEN_API_KEY}
+    secret_key: ${KRAKEN_SECRET_KEY}
+    sandbox: false
+    rate_limit: 60
+    max_position_size: 800000
+    supported_symbols: ["XBTUSD", "ETHUSD", "SOLUSD", "ADAUSD", "DOTUSD"]
+
+data_sources:
+  coingecko:
+    api_key: ${COINGECKO_API_KEY}
+    rate_limit: 50
+    cache_ttl: 300
+    
+  messari:
+    api_key: ${MESSARI_API_KEY}
+    rate_limit: 20
+    cache_ttl: 600
+    
+  glassnode:
+    api_key: ${GLASSNODE_API_KEY}
+    rate_limit: 10
+    cache_ttl: 1800
+    
+  santiment:
+    api_key: ${SANTIMENT_API_KEY}
+    rate_limit: 5
+    cache_ttl: 3600
+    
+  lunarcrush:
+    api_key: ${LUNARCRUSH_API_KEY}
+    rate_limit: 30
+    cache_ttl: 900
+    
+  twitter:
+    bearer_token: ${TWITTER_BEARER_TOKEN}
+    rate_limit: 300
+    cache_ttl: 300
+    
+  reddit:
+    client_id: ${REDDIT_CLIENT_ID}
+    client_secret: ${REDDIT_CLIENT_SECRET}
+    user_agent: "QuantumTradingBot/1.0"
+    rate_limit: 60
+    cache_ttl: 600
+    
+  news_api:
+    api_key: ${NEWS_API_KEY}
+    rate_limit: 100
+    cache_ttl: 1800
+    
+  cryptocompare:
+    api_key: ${CRYPTOCOMPARE_API_KEY}
+    rate_limit: 100
+    cache_ttl: 300
+
+neural_config:
+  model_types:
+    - transformer
+    - lstm
+    - cnn
+    - wavenet
+    - attention
+  ensemble_size: 15
+  training_batch_size: 64
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+  dropout: 0.1
+  num_epochs: 500
+  early_stopping_patience: 50
+  gradient_clip_norm: 1.0
+  scheduler_type: "cosine_annealing"
+  optimizer: "adamw"
+  feature_dim: 2048
+  sequence_length: 200
+  prediction_horizons: [300, 900, 1800, 3600]
+  confidence_threshold: 0.8
+  update_frequency: "real_time"
+  validation_split: 0.2
+  test_split: 0.1
+  cross_validation_folds: 5
+  model_ensemble_weights:
+    transformer: 0.35
+    lstm: 0.25
+    cnn: 0.20
+    wavenet: 0.20
+  ml_ensemble_weights:
+    xgboost: 0.4
+    lightgbm: 0.3
+    random_forest: 0.2
+    gradient_boost: 0.1
+
+risk_config:
+  max_var: 0.012
+  var_confidence_level: 0.05
+  max_position_size: 0.15
+  max_portfolio_concentration: 0.85
+  max_sector_concentration: 0.4
+  max_correlation: 0.65
+  stop_loss_pct: 0.055
+  take_profit_pct: 0.85
+  trailing_stop_pct: 0.03
+  position_sizing_method: "kelly"
+  kelly_fraction: 0.25
+  volatility_lookback: 252
+  correlation_lookback: 100
+  stress_test_scenarios: 7
+  stress_test_frequency: 3600
+  drawdown_limit: 0.08
+  leverage_limit: 1.0
+  margin_requirement: 0.1
+  liquidity_requirement: 1000000
+  var_models:
+    - parametric
+    - historical
+    - monte_carlo
+    - extreme_value
+  confidence_intervals: [0.90, 0.95, 0.99]
+
+execution_config:
+  max_slippage: 0.0015
+  execution_timeout: 12
+  chunk_size: 8000
+  min_chunk_size: 1000
+  max_chunks_per_order: 10
+  venue_selection_method: "smart_routing"
+  latency_threshold_ms: 500
+  liquidity_threshold: 50000
+  order_types: ["market", "limit", "stop", "iceberg"]
+  tif_options: ["GTC", "IOC", "FOK"]
+  smart_routing: true
+  mev_protection: true
+  latency_optimization: true
+  retry_attempts: 3
+  retry_delay_ms: 100
+  partial_fill_handling: true
+  venue_weights:
+    okx: 0.30
+    binance: 0.25
+    coinbase: 0.20
+    kraken: 0.15
+    huobi: 0.10
+  execution_strategies:
+    market_sweep:
+      max_size: 10000
+      chunk_delay_ms: 100
+    smart_limit:
+      max_size: 50000
+      price_improvement: 0.0002
+    iceberg_twap:
+      max_size: 200000
+      time_interval_ms: 2000
+    aggressive_market:
+      emergency_only: true
+      max_slippage: 0.005
+
+security_config:
+  threat_threshold: 0.97
+  scan_frequency: 600
+  cache_duration: 1800
+  honeypot_apis:
+    - name: "honeypot.is"
+      url: "https://api.honeypot.is/v2/IsHoneypot"
+      weight: 0.3
+    - name: "gopluslabs"
+      url: "https://api.gopluslabs.io/api/v1/token_security"
+      weight: 0.25
+    - name: "tokensniffer"
+      url: "https://tokensniffer.com/api/v1/tokens"
+      weight: 0.2
+    - name: "rugcheck"
+      url: "https://api.rugcheck.xyz/v1/tokens"
+      weight: 0.15
+    - name: "rugdoc"
+      url: "https://rugdoc.io/api/scan"
+      weight: 0.1
+  contract_analysis: true
+  social_monitoring: true
+  whale_tracking: true
+  audit_verification: true
+  team_verification: true
+  liquidity_lock_check: true
+  holder_analysis: true
+  transaction_analysis: true
+  risk_score_weights:
+    honeypot_risk: 0.25
+    rugpull_risk: 0.20
+    contract_risk: 0.20
+    liquidity_risk: 0.15
+    team_risk: 0.10
+    manipulation_risk: 0.10
+
+performance_targets:
+  annual_return: 0.75
+  max_drawdown: 0.06
+  sharpe_ratio: 4.0
+  sortino_ratio: 5.0
+  calmar_ratio: 8.0
+  win_rate: 0.82
+  profit_factor: 3.2
+  avg_trade_duration: 3600
+  max_trade_duration: 86400
+  min_trade_size: 1000
+  max_trade_size: 100000
+  volatility_target: 0.12
+  correlation_target: 0.3
+  information_ratio: 2.0
+  tracking_error: 0.05
+
+monitoring:
+  log_level: INFO
+  metrics_port: 9090
+  health_check_port: 8080
+  dashboard_port: 8050
+  alert_channels:
+    - email
+    - discord
+    - telegram
+    - slack
+  email:
+    smtp_server: ${SMTP_SERVER}
+    smtp_port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    recipients:
+      - admin@quantumsystem.io
+      - alerts@quantumsystem.io
+  discord:
+    webhook_url: ${DISCORD_WEBHOOK_URL}
+    bot_token: ${DISCORD_BOT_TOKEN}
+  telegram:
+    bot_token: ${TELEGRAM_BOT_TOKEN}
+    chat_ids:
+      - ${TELEGRAM_CHAT_ID_1}
+      - ${TELEGRAM_CHAT_ID_2}
+  slack:
+    webhook_url: ${SLACK_WEBHOOK_URL}
+    channel: "#trading-alerts"
+  alert_thresholds:
+    high_var: 0.02
+    high_drawdown: 0.05
+    low_sharpe: 1.0
+    execution_failure_rate: 0.1
+    system_cpu: 80
+    system_memory: 85
+    system_disk: 90
+    exchange_latency: 1000
+
+infrastructure:
+  redis_url: ${REDIS_URL}
+  vault_url: ${VAULT_URL}
+  vault_token: ${VAULT_TOKEN}
+  grafana_url: ${GRAFANA_URL}
+  prometheus_url: ${PROMETHEUS_URL}
+  backup_schedule: "0 2 * * *"
+  backup_retention_days: 30
+  log_retention_days: 90
+  cleanup_frequency: 86400
+
+symbols:
+  primary:
+    - "BTC-USDT"
+    - "ETH-USDT"
+    - "SOL-USDT"
+    - "ADA-USDT"
+    - "DOT-USDT"
+  secondary:
+    - "MATIC-USDT"
+    - "AVAX-USDT"
+    - "LINK-USDT"
+    - "UNI-USDT"
+    - "ATOM-USDT"
+  experimental:
+    - "NEAR-USDT"
+    - "FTM-USDT"
+    - "ALGO-USDT"
+    - "ICP-USDT"
+    - "VET-USDT"
+
+features:
+  market_data_streaming: true
+  neural_prediction: true
+  risk_management: true
+  multi_venue_execution: true
+  portfolio_optimization: true
+  security_scanning: true
+  performance_tracking: true
+  research_analysis: true
+  alert_system: true
+  dashboard: true
+  backtesting: true
+  paper_trading: false
+  live_trading: true
