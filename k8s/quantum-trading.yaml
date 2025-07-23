@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantum-trading
+  namespace: quantum-trading
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: quantum-trading
+  template:
+    metadata:
+      labels:
+        app: quantum-trading
+    spec:
+      nodeSelector:
+        nvidia.com/gpu: "true"
+      containers:
+      - name: quantum-trading
+        image: quantum-trading:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: quantum-config
+        - secretRef:
+            name: quantum-secrets
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 9090
+          name: metrics
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "8"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "32Gi"
+            cpu: "16"
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: quantum-logs
+          mountPath: /app/logs
+        - name: quantum-data
+          mountPath: /app/data
+        - name: quantum-config-volume
+          mountPath: /app/config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+      volumes:
+      - name: quantum-logs
+        persistentVolumeClaim:
+          claimName: quantum-logs-pvc
+      - name: quantum-data
+        persistentVolumeClaim:
+          claimName: quantum-data-pvc
+      - name: quantum-config-volume
+        configMap:
+          name: quantum-trading-config
+      imagePullSecrets:
+      - name: quantum-registry-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quantum-trading-service
+  namespace: quantum-trading
+spec:
+  selector:
+    app: quantum-trading
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+  type: ClusterIP
+
+---
